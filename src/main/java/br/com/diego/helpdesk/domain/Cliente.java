@@ -7,6 +7,8 @@ import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import br.com.diego.helpdesk.domain.enums.Perfil;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,7 +19,7 @@ import lombok.Setter;
 public class Cliente extends Pessoa implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
-	
+	@JsonIgnore
 	@OneToMany(mappedBy = "cliente")  // 1 Cliente para muitos chamados
 	private List<Chamado> chamados = new ArrayList<>();
 	
