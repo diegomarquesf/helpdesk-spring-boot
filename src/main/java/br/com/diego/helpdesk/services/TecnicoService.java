@@ -55,6 +55,16 @@ public class TecnicoService {
 		newTecnico.setSenha(tecnico.getSenha());
 	}
 	
+	public void delete(Integer id) {
+		findById(id);
+		try {
+			tecnicoRepository.deleteById(id);
+		} catch (Exception e) {
+			throw new DataIntegrityViolationException("Tecnico possui ordens de chamado e não pode ser Excluido");
+		}
+	}
+	
+	
 	private void validaPorCPFEMAIL(Tecnico tecnico) {
 		Optional<Pessoa> pessoa = pessoaRepository.findByCpf(tecnico.getCpf());
 		if(pessoa.isPresent() && pessoa.get().getId() != tecnico.getId() ) {
@@ -75,6 +85,9 @@ public class TecnicoService {
 		Tecnico tecnico = new Tecnico(null, newDTO.getNome(), newDTO.getCpf(), newDTO.getEmail(), newDTO.getSenha());
 		return tecnico;
 	}
+
+
+
 
 
 
