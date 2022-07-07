@@ -6,9 +6,12 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import br.com.diego.helpdesk.domain.Pessoa;
 import br.com.diego.helpdesk.domain.Tecnico;
 import br.com.diego.helpdesk.domain.dtos.TecnicoNewDTO;
+import br.com.diego.helpdesk.repositories.PessoaRepository;
 import br.com.diego.helpdesk.repositories.TecnicoRepository;
+import br.com.diego.helpdesk.services.exceptions.DataIntegrityViolationException;
 import br.com.diego.helpdesk.services.exceptions.ObjectNotFoundException;
 
 @Service
@@ -16,6 +19,8 @@ public class TecnicoService {
 
 	@Autowired
 	private TecnicoRepository tecnicoRepository;
+	@Autowired
+	private PessoaRepository pessoaRepository;
 	
 	
 	public Tecnico findById(Integer id) {
@@ -30,10 +35,23 @@ public class TecnicoService {
 
 
 	public Tecnico create(Tecnico tecnico) {
+		validaPorCPFEMAIL(tecnico);
 		tecnico = tecnicoRepository.save(tecnico);
 		return tecnico;
 	}
 	
+	private void validaPorCPFEMAIL(Tecnico tecnico) {
+		Optional<Pessoa> pessoa = pessoaRepository.findByCpf(tecnico.getCpf());
+		if(pessoa.isPresent() && pessoa.get().getId() != tecnico.getId() ) {
+			throw new DataIntegrityViolationException("CPF já cadastrado no sistema");
+		}
+		
+		pessoa = pessoaRepository.findByEmail(tecnico.getEmail());
+		if(pessoa.isPresent() && pessoa.get().getId() != tecnico.getId() ) {
+			throw new DataIntegrityViolationException("E-MAIL já cadastrado no sistema");
+		}
+	}
+
 	public Tecnico fromDTO(TecnicoNewDTO newDTO) {
 		Tecnico tecnico = new Tecnico(null, newDTO.getNome(), newDTO.getCpf(), newDTO.getEmail(), newDTO.getSenha());
 		return tecnico;
