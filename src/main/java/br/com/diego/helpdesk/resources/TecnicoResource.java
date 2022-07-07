@@ -4,6 +4,8 @@ import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,7 +33,7 @@ public class TecnicoResource {
 		return ResponseEntity.ok().body(new TecnicoDTO(tecnico));
 	}
 	
-	@RequestMapping(value = "/find", method = RequestMethod.GET)
+	@RequestMapping(method = RequestMethod.GET)
 	public ResponseEntity<List<TecnicoDTO>> findAll(){
 		List<Tecnico> list = tecnicoService.findAll();
 		List<TecnicoDTO> listDTO = list.stream().map(x -> new TecnicoDTO(x)).collect(Collectors.toList());
@@ -39,12 +41,13 @@ public class TecnicoResource {
 	}
 	
 	@RequestMapping(method = RequestMethod.POST)
-	public ResponseEntity<TecnicoDTO> create(@RequestBody TecnicoNewDTO newDTO){
+	public ResponseEntity<Tecnico> create(@Valid @RequestBody TecnicoNewDTO newDTO){
 		Tecnico tecnico = tecnicoService.fromDTO(newDTO);
 		tecnico = tecnicoService.create(tecnico);
 		
 		URI uri = ServletUriComponentsBuilder.fromCurrentContextPath() 
 				.path("/{id}").buildAndExpand(tecnico.getId()).toUri();
+		
 		return ResponseEntity.created(uri).build();
 	}
 

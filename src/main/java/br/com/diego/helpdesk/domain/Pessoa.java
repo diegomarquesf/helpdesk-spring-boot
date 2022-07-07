@@ -16,6 +16,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.validator.constraints.br.CPF;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -31,13 +34,19 @@ public abstract class Pessoa implements Serializable{
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	protected Integer id;
 	
+	@NotNull(message = "O campo NOME é requerido")
 	protected String nome;
 	
+	@NotNull(message = "O campo CPF é requerido")
+	@CPF
 	@Column(unique = true)
 	protected String cpf;
+	
+	@NotNull(message = "O campo EMAIL é requerido")
 	@Column(unique = true)
 	protected String email;
 	
+	@NotNull(message = "O campo SENHA é requerido")
 	protected String senha;
 	
 	@ElementCollection(fetch = FetchType.EAGER) //perfil vai vir junto com úsuario
