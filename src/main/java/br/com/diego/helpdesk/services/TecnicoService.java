@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import br.com.diego.helpdesk.domain.Pessoa;
 import br.com.diego.helpdesk.domain.Tecnico;
+import br.com.diego.helpdesk.domain.dtos.TecnicoDTO;
 import br.com.diego.helpdesk.domain.dtos.TecnicoNewDTO;
 import br.com.diego.helpdesk.repositories.PessoaRepository;
 import br.com.diego.helpdesk.repositories.TecnicoRepository;
@@ -40,6 +41,20 @@ public class TecnicoService {
 		return tecnico;
 	}
 	
+	public Tecnico update(Tecnico tecnico) {
+		Tecnico newTecnico = findById(tecnico.getId());
+		validaPorCPFEMAIL(tecnico);
+		updateData(newTecnico, tecnico);
+		return tecnicoRepository.save(newTecnico);
+	}
+	
+	public void updateData(Tecnico newTecnico, Tecnico tecnico) {
+		newTecnico.setNome(tecnico.getNome());
+		newTecnico.setCpf(tecnico.getCpf());
+		newTecnico.setEmail(tecnico.getEmail());
+		newTecnico.setSenha(tecnico.getSenha());
+	}
+	
 	private void validaPorCPFEMAIL(Tecnico tecnico) {
 		Optional<Pessoa> pessoa = pessoaRepository.findByCpf(tecnico.getCpf());
 		if(pessoa.isPresent() && pessoa.get().getId() != tecnico.getId() ) {
@@ -51,9 +66,16 @@ public class TecnicoService {
 			throw new DataIntegrityViolationException("E-MAIL já cadastrado no sistema");
 		}
 	}
+	
+	public Tecnico fromDTO(TecnicoDTO tecnicoDTO) {
+		return new Tecnico(tecnicoDTO.getId(), tecnicoDTO.getNome(), tecnicoDTO.getCpf(), tecnicoDTO.getEmail(), tecnicoDTO.getSenha());
+	}
 
 	public Tecnico fromDTO(TecnicoNewDTO newDTO) {
 		Tecnico tecnico = new Tecnico(null, newDTO.getNome(), newDTO.getCpf(), newDTO.getEmail(), newDTO.getSenha());
 		return tecnico;
 	}
+
+
+
 }
